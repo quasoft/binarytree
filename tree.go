@@ -79,3 +79,25 @@ func (n *Node) Insert(value ValueInterface) *Node {
 	}
 	return n
 }
+
+// PrevLeaf returns the leaf node that is to the left of the specified node.
+// If any of the children are internal nodes, traverses their children until
+// a leaf is found.
+func (n *Node) PrevLeaf() *Node {
+	left := n.Left
+	for !left.IsLeaf() {
+		left = left.Right
+	}
+	return left
+}
+
+// NextLeaf returns the leaf node that is to the right of the specified node.
+// If any of the children are internal nodes, traverses their children until
+// a leaf is found.
+func (n *Node) NextLeaf() *Node {
+	right := n.Right
+	for !right.IsLeaf() {
+		right = right.Left
+	}
+	return right
+}

@@ -2,6 +2,7 @@ package btree
 
 import (
 	"fmt"
+	"reflect"
 	"testing"
 )
 
@@ -104,6 +105,46 @@ func TestNode_Insert(t *testing.T) {
 	got = tree.String()
 	if got != want {
 		t.Errorf("tree.Insert(%v) = %v, want %v", value, got, want)
+	}
+}
+
+func TestNode_GetLeaf(t *testing.T) {
+	// Start with tree:
+	//               7
+	//       3               17
+	//    2     6	    12         22
+	//                           20  23
+	//                         19
+	tree := &Node{}
+	tree.Value = IntValue(7)
+	tree.Left = &Node{IntValue(3), &Node{IntValue(2), nil, nil}, &Node{IntValue(6), nil, nil}}
+	tree.Right = &Node{IntValue(17), &Node{IntValue(12), nil, nil}, &Node{IntValue(22), nil, nil}}
+	tree.Right.Right.Left = &Node{IntValue(20), &Node{IntValue(19), nil, nil}, nil}
+	tree.Right.Right.Right = &Node{IntValue(23), nil, nil}
+
+	tests := []struct {
+		name       string
+		node       *Node
+		methodName string
+		want       IntValue
+	}{
+		{"Previous leaf of root (7)", tree, "PrevLeaf", IntValue(6)},
+		{"Previous leaf of internal (3)", tree.Left, "PrevLeaf", IntValue(2)},
+		{"Previous leaf of internal (17)", tree.Right, "PrevLeaf", IntValue(12)},
+		{"Next leaf of root (7)", tree, "NextLeaf", IntValue(12)},
+		{"Next leaf of internal  (3)", tree.Left, "NextLeaf", IntValue(6)},
+		{"Next leaf of internal  (17)", tree.Right, "NextLeaf", IntValue(19)},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			val := reflect.ValueOf(tt.node)
+			method := val.MethodByName(tt.methodName)
+			node := method.Call(nil)[0].Interface().(*Node)
+			got := node.Value.(IntValue)
+			if got != tt.want {
+				t.Errorf("%v.PrevLeaf() = %v, want %v", tt.node.Value, got, tt.want)
+			}
+		})
 	}
 }
 
