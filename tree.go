@@ -1,9 +1,9 @@
-// Package binarytree is simple binary tree implementation that can store
+// Package btree is simple binary tree implementation that can store
 // any value type that implements ValueInterface.
 // This implementation is a modified version of 'golang/tour/tree.go',
 // (https://github.com/golang/tour/blob/master/tree/tree.go), adapted to
 // store values of custom types.
-package binarytree
+package btree
 
 import "fmt"
 
